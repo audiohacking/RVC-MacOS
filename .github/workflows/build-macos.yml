@@ -70,8 +70,15 @@ jobs:
         
     - name: Upload to Release
       run: |
+        # Check if DMG files exist
+        if ! ls dist/*.dmg 1> /dev/null 2>&1; then
+          echo "Error: No DMG files found in dist/ directory"
+          exit 1
+        fi
+        
         if [ "${{ github.event_name }}" == "release" ]; then
           # Upload to the release that triggered this workflow
+          echo "Uploading to release ${{ steps.get_version.outputs.TAG_NAME }}..."
           gh release upload "${{ steps.get_version.outputs.TAG_NAME }}" dist/*.dmg --clobber
         else
           # For workflow_dispatch, try to find matching release
