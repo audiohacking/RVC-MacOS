@@ -55,11 +55,12 @@ jobs:
       id: get_version
       run: |
         if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-          VERSION="${{ github.event.inputs.version }}"
-          # Remove 'v' prefix if present
-          VERSION="${VERSION#v}"
+          # Use version exactly as provided from dispatch event
+          TAG_NAME="${{ github.event.inputs.version }}"
+          # Remove 'v' prefix for VERSION if present
+          VERSION="${TAG_NAME#v}"
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
-          echo "TAG_NAME=v$VERSION" >> $GITHUB_OUTPUT
+          echo "TAG_NAME=$TAG_NAME" >> $GITHUB_OUTPUT
         else
           # Extract from release tag
           TAG_NAME="${{ github.event.release.tag_name }}"
