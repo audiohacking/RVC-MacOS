@@ -4,9 +4,10 @@ Launcher script for RVC-MacOS standalone application.
 This script serves as the main entry point for the .app bundle.
 
 RVC requires several model files to function. This launcher will:
-1. Check if required models are present
-2. Download models if missing (on first run)
-3. Start the web interface
+1. Set up the environment (following run.sh pattern)
+2. Check if required models are present
+3. Download models if missing (on first run)
+4. Start the web interface (by importing and running web.py)
 
 Required models:
 - assets/hubert/hubert_base.pt (~189MB)
@@ -19,9 +20,8 @@ Required models:
 import sys
 import os
 import logging
-from pathlib import Path
 
-# Configure logging
+# Configure logging early
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -29,32 +29,49 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 def setup_environment():
-    """Set up the environment for the bundled app."""
+    """
+    Set up the environment for the bundled app.
+    Mimics the behavior of run.sh for consistency.
+    """
     if getattr(sys, 'frozen', False):
         # Running in a bundle - get the bundle directory
         if hasattr(sys, '_MEIPASS'):
             bundle_dir = sys._MEIPASS
         else:
+            # py2app sets executable path
             bundle_dir = os.path.dirname(sys.executable)
         
         # Change to the Resources directory which contains our app files
+        # In a .app bundle: Contents/MacOS/launcher -> Contents/Resources/
         resources_dir = os.path.join(bundle_dir, '..', 'Resources')
         if os.path.exists(resources_dir):
+            resources_dir = os.path.abspath(resources_dir)
             os.chdir(resources_dir)
-            logger.info(f"Changed directory to: {os.getcwd()}")
+            logger.info(f"Working directory: {os.getcwd()}")
         else:
             os.chdir(bundle_dir)
-            logger.info(f"Changed directory to: {os.getcwd()}")
+            logger.info(f"Working directory: {os.getcwd()}")
     
-    # Add current directory to path
-    sys.path.insert(0, os.getcwd())
+    # Add current directory to Python path (like run.sh does)
+    now_dir = os.getcwd()
+    sys.path.insert(0, now_dir)
+    
+    # Set environment variables for macOS (from web.py initialization)
+    if sys.platform == "darwin":
+        os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
+        os.environ["OMP_NUM_THREADS"] = "1"
+    
+    logger.info("Environment configured for RVC-MacOS")
 
 def check_and_download_models():
-    """Check if required models exist and download if missing."""
+    """
+    Check if required models exist and download if missing.
+    Follows the pattern from run.sh --download-models option.
+    """
     from dotenv import load_dotenv
     import shutil
     
-    # Load environment variables for model verification
+    # Load environment variables for model verification (like web.py does)
     load_dotenv()
     load_dotenv("sha256.env")
     
@@ -73,7 +90,7 @@ def check_and_download_models():
         logger.info("✓ All required models are present!")
         return True
     
-    # Models are missing - inform user about download
+    # Models are missing - inform user about download (like run.sh does)
     logger.info("")
     logger.info("="*60)
     logger.info("FIRST-TIME SETUP: Downloading Required AI Models")
@@ -95,7 +112,7 @@ def check_and_download_models():
     logger.info("="*60)
     logger.info("")
     
-    # Create temp directory for downloads
+    # Create temp directory for downloads (like run.sh pattern)
     now_dir = os.getcwd()
     tmp = os.path.join(now_dir, "TEMP")
     shutil.rmtree(tmp, ignore_errors=True)
@@ -106,7 +123,7 @@ def check_and_download_models():
         logger.info("Starting download process...")
         download_all_assets(tmpdir=tmp)
         
-        # Verify download was successful
+        # Verify download was successful (like run.sh checks exit codes)
         logger.info("")
         logger.info("Verifying downloaded models...")
         if check_all_assets(update=True):
@@ -147,15 +164,18 @@ def check_and_download_models():
         shutil.rmtree(tmp, ignore_errors=True)
 
 def main():
-    """Main entry point for RVC-MacOS application."""
+    """
+    Main entry point for RVC-MacOS application.
+    Follows the initialization pattern from run.sh and web.py.
+    """
     logger.info("="*60)
     logger.info("RVC-MacOS - Voice Conversion for Apple Silicon")
     logger.info("="*60)
     
-    # Set up environment
+    # Set up environment (like run.sh does with venv and paths)
     setup_environment()
     
-    # Check and download models if needed
+    # Check and download models if needed (like run.sh --download-models)
     logger.info("")
     models_ready = check_and_download_models()
     
@@ -167,7 +187,7 @@ def main():
         logger.warning("")
         input("Press Enter to continue anyway, or close this window to exit...")
     
-    # Start the web interface
+    # Start the web interface (like run.sh: python web.py --pycmd python)
     logger.info("")
     logger.info("="*60)
     logger.info("Starting RVC Web Interface...")
@@ -182,9 +202,12 @@ def main():
     logger.info("")
     
     try:
-        # Import and run the main web application
+        # Import and run web.py (this will execute all its initialization)
+        # This is equivalent to: python web.py --pycmd python
         import web
-        # web.py will handle the rest and keep running
+        # web.py sets up gradio and launches the app at the module level
+        # The gradio app.launch() is at the end of web.py and will run when imported
+        
     except KeyboardInterrupt:
         logger.info("")
         logger.info("="*60)
