@@ -9,7 +9,9 @@ RVC-MacOS requires several model files to function:
 - assets/pretrained_v2/*.pth (12 files: same as above for v2)
 - assets/uvr5_weights/*.pth (optional, for vocal separation)
 
-These models must be downloaded before building or will be downloaded on first run.
+These models will be downloaded on first run.
+
+IMPORTANT: This build includes ALL Python dependencies. Users don't need to install anything.
 """
 
 from setuptools import setup
@@ -32,45 +34,140 @@ DATA_FILES = [
 print("\n" + "="*60)
 print("RVC-MacOS Build Configuration")
 print("="*60)
+print("Python Dependencies: ALL INCLUDED (fully standalone)")
 print("Models: NOT pre-bundled (downloaded on first run)")
-print("This keeps the app bundle size smaller (~500MB vs ~2-3GB)")
+print("\nThis keeps the app bundle size at ~500MB")
+print("Models (~1.5GB) are downloaded on first launch")
 print("\nOn first launch, the app will:")
 print("  1. Check for required models")
 print("  2. Download ~1.5GB of AI models (takes 5-10 minutes)")
 print("  3. Start the web interface")
-print("\nUsers will be informed of the download progress.")
+print("\nUsers will NOT need to install Python or any dependencies!")
 print("="*60 + "\n")
 
+# Comprehensive package list - EVERYTHING must be included in the frozen app
+# Users should NOT need to install anything manually
 OPTIONS = {
     'argv_emulation': False,
     'packages': [
-        'gradio',
+        # Core PyTorch and related (SECURITY: >= 2.6.0 for vulnerability fixes)
         'torch',
+        'torchvision', 
         'torchaudio',
-        'torchvision',
-        'numpy',
-        'scipy',
-        'librosa',
-        'soundfile',
-        'faiss',
-        'sklearn',
+        'torchcrepe',
+        'torchfcpe',
+        
+        # Web frameworks
+        'gradio',
         'flask',
+        'flask_cors',
         'fastapi',
         'uvicorn',
-        'fairseq',
-        'praat-parselmouth',
-        'pyworld',
-        'httpx',
-        'pydantic',
         'starlette',
+        'httpx',
+        
+        # Scientific computing
+        'numpy',
+        'scipy',
+        'scikit_learn',
+        'sklearn',
+        
+        # Audio processing
+        'librosa',
+        'soundfile',
+        'resampy',
+        'audioread',
+        'pydub',
+        'pyworld',
+        'praat-parselmouth',
+        'sounddevice',
+        'noisereduce',
+        'av',
+        
+        # ML/AI frameworks
+        'fairseq',
+        'faiss',
+        'onnxruntime',
+        
+        # Utilities
+        'einops',
+        'numba',
+        'llvmlite',
+        'Cython',
+        'gin',
+        'gin_config',
+        'local_attention',
+        'tqdm',
+        'joblib',
+        'tensorboard',
+        'tensorboardX',
+        
+        # Web and data
+        'pydantic',
+        'PyYAML',
+        'json5',
+        'Markdown',
+        'Jinja2',
+        'Pillow',
+        'matplotlib',
+        'matplotlib-inline',
+        
+        # System
+        'wave',
+        'dotenv',
+        'pybase16384',
+        'colorama',
+        'tabulate',
+        'fsspec',
+        'sympy',
+        'tornado',
+        'Werkzeug',
+        'absl-py',
+        'pyasn1',
+        'pyasn1-modules',
+        'uc-micro-py',
+        
+        # GUI (if needed)
+        'FreeSimpleGUI',
     ],
     'includes': [
+        # Explicitly include main modules
         'web',
         'gui',
         'convert_audio',
         'download_models',
+        
+        # Include all submodules
+        'infer.lib.rvcmd',
+        'infer.lib.audio',
+        'infer.lib.rtrvc',
+        'infer.lib.train.data_utils',
+        'infer.modules.vc.pipeline',
+        'rvc.synthesizer',
+        'rvc.f0',
+        'rvc.hubert',
+        'rvc.layers',
+        
+        # Ensure all imports are included
+        'encodings.idna',
+        'encodings.utf_8',
+        'email.mime',
+        'email.mime.text',
+        'email.mime.multipart',
+        'email.mime.base',
+        'logging.handlers',
     ],
-    'iconfile': 'assets/icon.icns',  # Icon file (will need to be created)
+    'excludes': [
+        # Exclude test and doc modules to reduce size
+        'test',
+        'tests',
+        'testing',
+        'unittest',
+        'pydoc',
+        'tkinter',
+    ],
+    'frameworks': [],
+    'iconfile': 'assets/icon.icns',  # Icon file (will create if needed)
     'plist': {
         'CFBundleName': 'RVC-MacOS',
         'CFBundleDisplayName': 'RVC Voice Conversion',
@@ -82,11 +179,17 @@ OPTIONS = {
         'NSHighResolutionCapable': True,
         'LSMinimumSystemVersion': '12.0',
         'NSRequiresAquaSystemAppearance': False,
+        'NSAppTransportSecurity': {
+            'NSAllowsArbitraryLoads': True  # Allow model downloads from internet
+        },
     },
-    'semi_standalone': False,
-    'site_packages': True,
-    'strip': False,
-    'optimize': 0,
+    'semi_standalone': False,  # Fully standalone - include everything
+    'site_packages': True,      # Include site-packages
+    'strip': False,             # Don't strip symbols (helps with debugging)
+    'optimize': 0,              # No optimization for better compatibility
+    'matplotlib_backends': ['macosx'],  # Include macOS matplotlib backend
+    'resources': [],
+    'emulate_shell_environment': False,
 }
 
 setup(

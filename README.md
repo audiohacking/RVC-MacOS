@@ -3,6 +3,7 @@
 # Retrieval-based-Voice-Conversion-WebUI
 An easy-to-use voice conversion framework based on VITS - for MacOS
 
+> **🔒 Security Update**: This version includes PyTorch 2.6.0+ to address critical security vulnerabilities. See [SECURITY.md](./SECURITY.md) for details.
 
 
 [![madewithlove](https://img.shields.io/badge/made_with-%E2%9D%A4-red?style=for-the-badge&labelColor=orange

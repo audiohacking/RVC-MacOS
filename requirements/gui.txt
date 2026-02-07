@@ -1,8 +1,16 @@
-#1.Install torch from pytorch.org:
-#torch 2.0 with cuda 11.8
-#pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
-#torch 1.11.0 with cuda 11.3
-#pip install torch==1.11.0+cu113 torchvision==0.12.0+cu113 torchaudio==0.11.0 --extra-index-url https://download.pytorch.org/whl/cu113
+# PyTorch Installation for macOS
+# SECURITY: Using torch >= 2.6.0 to address critical vulnerabilities:
+#   - CVE: Heap buffer overflow (fixed in 2.2.0)
+#   - CVE: Use-after-free (fixed in 2.2.0)
+#   - CVE: torch.load RCE with weights_only=True (fixed in 2.6.0)
+#
+# For macOS (Apple Silicon M1/M2/M3 or Intel):
+# Install torch with MPS (Metal Performance Shaders) support
+torch>=2.6.0
+torchvision>=0.21.0
+torchaudio>=2.6.0
+
+# Other dependencies
 einops
 fairseq
 flask
@@ -26,3 +34,4 @@ sounddevice
 gradio
 noisereduce
 torchfcpe
+
