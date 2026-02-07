@@ -92,6 +92,7 @@ jobs:
           fi
         fi
       env:
+        # GH_TOKEN is the environment variable expected by the gh CLI
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
     - name: Upload artifacts
