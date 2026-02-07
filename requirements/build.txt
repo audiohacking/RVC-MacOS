@@ -1,0 +1,6 @@
+# Requirements for building the macOS application bundle
+# These are in addition to the regular runtime requirements
+
+py2app>=0.28
+setuptools>=65.0.0
+wheel>=0.40.0
