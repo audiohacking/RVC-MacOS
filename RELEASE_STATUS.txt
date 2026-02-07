@@ -1,0 +1,93 @@
+╔════════════════════════════════════════════════════════════════════╗
+║                   RVC-MacOS v0.0.1 Test Release                     ║
+║                         READY TO DEPLOY                             ║
+╚════════════════════════════════════════════════════════════════════╝
+
+┌─ Preparation Status ────────────────────────────────────────────────┐
+│ [✓] Version files updated to 0.0.1                                  │
+│ [✓] CHANGELOG.md updated with release notes                         │
+│ [✓] GitHub Actions workflow fixed (no model download)               │
+│ [✓] Git tag v0.0.1 created locally                                  │
+│ [✓] All changes committed                                           │
+│ [✓] Comprehensive documentation created                             │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌─ What Changed ──────────────────────────────────────────────────────┐
+│ VERSION:                1.0.0 → 0.0.1                               │
+│ setup.py:               All versions updated to 0.0.1               │
+│ CHANGELOG.md:           Added v0.0.1 release section                │
+│ build-macos.yml:        Removed model download step                 │
+│ New file:               RELEASE_v0.0.1_INSTRUCTIONS.md              │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌─ Key Design Decision ───────────────────────────────────────────────┐
+│ Models are NOT downloaded during build                              │
+│   → Keeps DMG size at ~500MB instead of ~3GB                        │
+│   → Users download models on first app launch (~1.5GB)              │
+│   → Consistent with original design document                        │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌─ To Trigger Release ────────────────────────────────────────────────┐
+│                                                                      │
+│ Option 1: Push the tag                                              │
+│   $ git push origin v0.0.1                                          │
+│                                                                      │
+│ Option 2: GitHub UI                                                 │
+│   Visit: https://github.com/audiohacking/RVC-MacOS/releases/new    │
+│   - Tag: v0.0.1                                                     │
+│   - Target: copilot/generate-rvc-macos-app                          │
+│   - Title: Test Release v0.0.1                                      │
+│   - Mark as pre-release                                             │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌─ What Will Happen ──────────────────────────────────────────────────┐
+│ 1. GitHub Actions triggers on macOS-latest runner                   │
+│ 2. Installs Python 3.10 and system dependencies                     │
+│ 3. Installs PyTorch 2.6.0+ and all Python packages                  │
+│ 4. Builds .app bundle with py2app                                   │
+│ 5. Creates DMG installer                                            │
+│ 6. Creates GitHub Release with DMG                                  │
+│ 7. Uploads artifacts (DMG + .app) for 30 days                       │
+│                                                                      │
+│ Expected Duration: 20-40 minutes                                    │
+│ Expected DMG Size: ~500MB                                           │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌─ Monitor Build ─────────────────────────────────────────────────────┐
+│ Actions:  https://github.com/audiohacking/RVC-MacOS/actions        │
+│ Release:  https://github.com/audiohacking/RVC-MacOS/releases       │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌─ If Build Fails ────────────────────────────────────────────────────┐
+│ 1. Check Actions logs for errors                                    │
+│ 2. Fix the issue in code                                            │
+│ 3. Delete tag: git push origin :refs/tags/v0.0.1                    │
+│ 4. Delete release via GitHub UI                                     │
+│ 5. Recreate tag after fix                                           │
+│ 6. Push tag again to retry                                          │
+│                                                                      │
+│ See RELEASE_v0.0.1_INSTRUCTIONS.md for detailed troubleshooting    │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌─ Success Criteria ──────────────────────────────────────────────────┐
+│ [_] GitHub Actions completes without errors                         │
+│ [_] Release created at correct URL                                  │
+│ [_] DMG file is ~500MB (not 2-3GB)                                  │
+│ [_] DMG contains RVC-MacOS.app                                      │
+│ [_] App bundle contains Python and dependencies                     │
+│ [_] No models are pre-bundled                                       │
+│ [_] Artifacts uploaded successfully                                 │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌─ Current Repository State ──────────────────────────────────────────┐
+│ Branch:       copilot/generate-rvc-macos-app                        │
+│ Latest:       af4ffe7 (Add release instructions)                    │
+│ Tag:          v0.0.1 (created locally)                              │
+│ Status:       Clean working tree                                    │
+│ Ready:        YES - waiting for tag push                            │
+└─────────────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════
+                            READY TO RELEASE! 🚀
+═══════════════════════════════════════════════════════════════════════
