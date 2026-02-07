@@ -1,0 +1,40 @@
+# PyTorch for DirectML (Windows DirectX) - NOT USED for macOS
+# SECURITY: Updated to use torch >= 2.6.0 to address critical vulnerabilities
+# This file is for Windows DirectML only, not used in macOS app packaging
+
+# Install PyTorch with secure version:
+torch>=2.6.0
+torchvision>=0.21.0
+torchaudio>=2.6.0
+
+# Legacy commented out (VULNERABLE):
+#1.Install torch from pytorch.org:
+#torch 2.0 with cuda 11.8
+#pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+#torch 1.11.0 with cuda 11.3
+#pip install torch==1.11.0+cu113 torchvision==0.12.0+cu113 torchaudio==0.11.0 --extra-index-url https://download.pytorch.org/whl/cu113
+
+einops
+fairseq
+flask
+flask_cors
+gin
+gin_config
+librosa
+local_attention
+matplotlib
+praat-parselmouth
+pyworld
+PyYAML
+resampy
+scikit_learn
+scipy
+tensorboard
+tqdm
+wave
+FreeSimpleGUI
+sounddevice
+gradio
+noisereduce
+onnxruntime-directml
+torchfcpe
