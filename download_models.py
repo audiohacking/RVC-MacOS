@@ -3,6 +3,7 @@
 Script to download all required models for RVC-WebUI-MacOS.
 This script downloads models without starting the web interface.
 """
+
 import os
 import sys
 import shutil
@@ -45,7 +46,7 @@ print()
 try:
     # Download all assets
     download_all_assets(tmpdir=tmp)
-    
+
     # Verify download was successful
     print()
     print("Verifying downloaded models...")
@@ -63,7 +64,7 @@ try:
         print("  You may want to try running this script again.")
         print("  The application may have limited functionality without all models.")
         sys.exit(2)
-        
+
 except Exception as e:
     print()
     print(f"✗ Error during download: {e}")

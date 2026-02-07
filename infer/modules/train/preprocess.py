@@ -84,20 +84,20 @@ class PreProcess:
     def pipeline(self, path):
         try:
             # Skip .DS_Store files
-            if os.path.basename(path) == '.DS_Store':
+            if os.path.basename(path) == ".DS_Store":
                 return None
-            
+
             audio = load_audio(path, self.sr)
             if audio is None:
                 return None
-            
+
             # zero phased digital filter cause pre-ringing noise...
             # audio = signal.filtfilt(self.bh, self.ah, audio)
             audio = signal.lfilter(self.bh, self.ah, audio)
 
             # Extract basename from path for use as filename prefix
             basename = os.path.splitext(os.path.basename(path))[0]
-            
+
             idx1 = 0
             for audio in self.slicer.slice(audio):
                 i = 0

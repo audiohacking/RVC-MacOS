@@ -45,10 +45,10 @@ class RMVPE(nn.Module):
         super().__init__()
         self.device = device
         self.is_half = is_half
-        
+
         if not os.path.exists(model_path):
             raise FileNotFoundError(f"Model file not found: {model_path}")
-        
+
         try:
             # First try to load as a JIT model
             try:
@@ -60,16 +60,16 @@ class RMVPE(nn.Module):
                 return
             except:
                 pass
-            
+
             # If JIT loading fails, try loading as a regular state dict
             state_dict = torch.load(model_path, map_location=device, weights_only=False)
-            
+
             # Check if it's a complete model or just state dict
-            if hasattr(state_dict, 'forward'):
+            if hasattr(state_dict, "forward"):
                 self.model = state_dict
             else:
                 # Check if it's a U-Net based model
-                if any(key.startswith('unet.') for key in state_dict.keys()):
+                if any(key.startswith("unet.") for key in state_dict.keys()):
                     self.model = UNet(in_channels=1, out_channels=1)
                     self.model.load_state_dict(state_dict)
                 else:
@@ -79,24 +79,24 @@ class RMVPE(nn.Module):
                         nn.ReLU(),
                         nn.Conv2d(32, 32, kernel_size=3, padding=1),
                         nn.ReLU(),
-                        nn.Conv2d(32, 1, kernel_size=3, padding=1)
+                        nn.Conv2d(32, 1, kernel_size=3, padding=1),
                     )
                     self.model.load_state_dict(state_dict)
-            
+
             self.model.eval()
             if is_half:
                 self.model = self.model.half()
             self.model = self.model.to(device)
         except Exception as e:
             raise RuntimeError(f"Failed to load model: {str(e)}")
-    
+
     def forward(self, x):
         with torch.no_grad():
             x = x.to(self.device)
             if self.is_half:
                 x = x.half()
             return self.model(x)
-            
+
     def calculate(self, x):
         return self.forward(x)
 

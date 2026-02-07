@@ -10,8 +10,20 @@ from io import BytesIO
 
 # Fix for PyTorch weights_only issue
 original_torch_load = torch.load
-def patched_torch_load(f, map_location=None, pickle_module=None, weights_only=False, **kwargs):
-    return original_torch_load(f, map_location=map_location, pickle_module=pickle_module, weights_only=False, **kwargs)
+
+
+def patched_torch_load(
+    f, map_location=None, pickle_module=None, weights_only=False, **kwargs
+):
+    return original_torch_load(
+        f,
+        map_location=map_location,
+        pickle_module=pickle_module,
+        weights_only=False,
+        **kwargs,
+    )
+
+
 torch.load = patched_torch_load
 
 from infer.lib.audio import load_audio, wav2, save_audio, float_np_array_to_wav_buf
@@ -37,7 +49,7 @@ class VC:
 
     def get_vc(self, sid, *to_return_protect):
         logger.info("Get sid: " + str(sid))
-        
+
         if sid is None or sid == "":
             logger.warning("No model selected (sid is None or empty)")
             return (
@@ -46,7 +58,10 @@ class VC:
                 {"visible": False, "__type__": "update"},
                 {"value": "", "__type__": "update"},
                 {"value": "", "__type__": "update"},
-                {"value": "No model selected. Please select a voice model first.", "__type__": "update"},
+                {
+                    "value": "No model selected. Please select a voice model first.",
+                    "__type__": "update",
+                },
             )
 
         to_return_protect0 = {
@@ -179,11 +194,15 @@ class VC:
 
             # Check if pipeline is initialized
             if self.pipeline is None:
-                raise ValueError("Pipeline not initialized. Please load a voice model first.")
-            
+                raise ValueError(
+                    "Pipeline not initialized. Please load a voice model first."
+                )
+
             # Check if net_g is loaded
             if self.net_g is None:
-                raise ValueError("Voice model not loaded. Please select and load a voice model first.")
+                raise ValueError(
+                    "Voice model not loaded. Please select and load a voice model first."
+                )
 
             audio_opt = self.pipeline.pipeline(
                 self.hubert_model,

@@ -68,7 +68,9 @@ class Generator(object):
         manual_f0: Optional[Union[np.ndarray, list]] = None,
     ) -> Tuple[np.ndarray, np.ndarray]:
         if torch.is_tensor(x):
-            x = x.cpu().numpy().astype(np.float32)  # Ensure float32 for MPS compatibility
+            x = (
+                x.cpu().numpy().astype(np.float32)
+            )  # Ensure float32 for MPS compatibility
         f0_min = 50
         f0_max = 1100
         if f0_method == "pm":
@@ -115,9 +117,10 @@ class Generator(object):
                 except Exception as rmvpe_error:
                     print(f"RMVPE initialization failed: {rmvpe_error}")
                     print("Falling back to FCPE method...")
-                    
+
                     # Fallback to FCPE method
                     from .fcpe import FCPE
+
                     self.fcpe = FCPE(
                         self.window,
                         f0_min,
@@ -135,7 +138,7 @@ class Generator(object):
                         1127 * log(1 + f0_max / 700),
                         manual_f0,
                     )
-            
+
             f0 = self.rmvpe.compute_f0(x, p_len=p_len, filter_radius=0.03)
             if "privateuseone" in str(self.device):  # clean ortruntime memory
                 del self.rmvpe.model

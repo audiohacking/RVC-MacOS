@@ -17,12 +17,12 @@ def get_rmvpe(model_path, device, is_half=True):
             return model
         except Exception as jit_e:
             print(f"JIT loading failed: {jit_e}")
-        
+
         # If JIT loading fails, this model format is not yet supported
         raise NotImplementedError(
             "The current RMVPE model format is not yet supported in this implementation. "
             "The system will fall back to an alternative F0 estimation method (FCPE)."
         )
-        
+
     except Exception as e:
         raise RuntimeError(f"Failed to load RMVPE model: {str(e)}")

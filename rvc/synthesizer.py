@@ -16,12 +16,12 @@ def get_synthesizer(cpt: OrderedDict, device=torch.device("cpu")):
         encoder_dim = 256
     elif version == "v2":
         encoder_dim = 768
-    
+
     # For v2 models, append encoder_dim and use_f0 to config
     config = list(cpt["config"])
     if version == "v2":
         config.extend([encoder_dim, if_f0 == 1])
-    
+
     net_g = SynthesizerTrnMsNSFsid(*config)
     del net_g.enc_q
     net_g.load_state_dict(cpt["weight"], strict=False)
@@ -31,9 +31,7 @@ def get_synthesizer(cpt: OrderedDict, device=torch.device("cpu")):
     return net_g, cpt
 
 
-def load_synthesizer(
-    pth_path: Union[str, BytesIO], device=torch.device("cpu")
-):
+def load_synthesizer(pth_path: Union[str, BytesIO], device=torch.device("cpu")):
     return get_synthesizer(
         torch.load(pth_path, map_location=torch.device("cpu"), weights_only=True),
         device,

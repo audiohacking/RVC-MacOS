@@ -133,7 +133,8 @@ class Pipeline(object):
             if self.is_half:
                 npy = npy.astype("float16")
             feats = (
-                torch.from_numpy(npy).float().unsqueeze(0).to(self.device) * index_rate  # Ensure float32 for MPS compatibility
+                torch.from_numpy(npy).float().unsqueeze(0).to(self.device)
+                * index_rate  # Ensure float32 for MPS compatibility
                 + (1 - index_rate) * feats
             )
 
@@ -272,7 +273,9 @@ class Pipeline(object):
             # Ensure float32 for MPS compatibility
             pitchf = pitchf.astype(np.float32)
             pitch = torch.tensor(pitch, device=self.device).unsqueeze(0).long()
-            pitchf = torch.tensor(pitchf, device=self.device, dtype=torch.float32).unsqueeze(0)
+            pitchf = torch.tensor(
+                pitchf, device=self.device, dtype=torch.float32
+            ).unsqueeze(0)
         t2 = time()
         times[1] += t2 - t1
         for t in opt_ts:

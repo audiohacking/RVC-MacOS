@@ -19,8 +19,20 @@ if torch.backends.mps.is_available():
 
 # Fix for PyTorch weights_only issue
 original_torch_load = torch.load
-def patched_torch_load(f, map_location=None, pickle_module=None, weights_only=False, **kwargs):
-    return original_torch_load(f, map_location=map_location, pickle_module=pickle_module, weights_only=False, **kwargs)
+
+
+def patched_torch_load(
+    f, map_location=None, pickle_module=None, weights_only=False, **kwargs
+):
+    return original_torch_load(
+        f,
+        map_location=map_location,
+        pickle_module=pickle_module,
+        weights_only=False,
+        **kwargs,
+    )
+
+
 torch.load = patched_torch_load
 
 from infer.modules.vc import VC, show_info, hash_similarity
@@ -47,7 +59,6 @@ import traceback
 import threading
 import shutil
 import logging
-
 
 logging.getLogger("numba").setLevel(logging.WARNING)
 logging.getLogger("httpx").setLevel(logging.WARNING)
@@ -213,10 +224,10 @@ def change_choices():
     index_paths = [""]
     lookup_indices(index_root)
     lookup_indices(outside_index_root)
-    
+
     # Filter out empty strings for the dropdown
     model_choices = [name for name in sorted(names) if name.strip()]
-    
+
     return {"choices": model_choices, "__type__": "update"}, {
         "choices": sorted(index_paths),
         "__type__": "update",
@@ -801,10 +812,10 @@ with gr.Blocks(title="RVC WebUI") as app:
                 # Filter out empty strings and ensure we have valid choices
                 model_choices = [name for name in sorted(names) if name.strip()]
                 sid0 = gr.Dropdown(
-                    label=i18n("Inferencing voice"), 
+                    label=i18n("Inferencing voice"),
                     choices=model_choices,
                     interactive=True,
-                    value=model_choices[0] if model_choices else None
+                    value=model_choices[0] if model_choices else None,
                 )
                 with gr.Column():
                     refresh_button = gr.Button(
@@ -1130,10 +1141,10 @@ with gr.Blocks(title="RVC WebUI") as app:
                 with gr.Column():
                     if len(uvr5_names) > 0:
                         model_choose = gr.Dropdown(
-                            label=i18n("Model"), 
-                            choices=uvr5_names, 
+                            label=i18n("Model"),
+                            choices=uvr5_names,
                             value=uvr5_names[0],
-                            interactive=True
+                            interactive=True,
                         )
                     else:
                         # Show detailed instructions for UVR5 models
@@ -1152,11 +1163,11 @@ UVR5 models are required for vocal/accompaniment separation. To use this feature
 After adding models, click "Convert" to refresh the dropdown.
                         """)
                         model_choose = gr.Dropdown(
-                            label=i18n("Model"), 
-                            choices=["Please download UVR5 models first"], 
+                            label=i18n("Model"),
+                            choices=["Please download UVR5 models first"],
                             value="Please download UVR5 models first",
                             interactive=True,
-                            info="This feature requires UVR5 models to be downloaded first."
+                            info="This feature requires UVR5 models to be downloaded first.",
                         )
                     agg = gr.Slider(
                         minimum=0,
