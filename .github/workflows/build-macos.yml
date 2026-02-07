@@ -40,10 +40,9 @@ jobs:
         pip install -r requirements/gui.txt
         pip install py2app
         
-    - name: Download models
-      run: |
-        source .venv/bin/activate
-        python download_models.py
+    # NOTE: Models are NOT downloaded during build
+    # They will be downloaded by users on first app launch
+    # This keeps the DMG size at ~500MB instead of ~3GB
         
     - name: Build application
       run: |
