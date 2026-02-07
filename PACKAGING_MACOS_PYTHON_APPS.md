@@ -6,6 +6,59 @@ This guide explains how to package the RVC-MacOS Python application as a native 
 
 RVC-MacOS uses `py2app` to create standalone macOS application bundles. This approach bundles Python, all dependencies, and application code into a single `.app` package that can be distributed to end users.
 
+### RVC-Specific Requirements
+
+RVC (Retrieval-based Voice Conversion) requires several large model files to function:
+
+1. **HuBERT Model** (~189MB)
+   - `assets/hubert/hubert_base.pt`
+   - Used for feature extraction
+
+2. **RMVPE Pitch Extraction Models** (~110MB total)
+   - `assets/rmvpe/rmvpe.pt`
+   - `assets/rmvpe/rmvpe.onnx`
+   - Used for pitch detection
+
+3. **Pretrained RVC Models v1** (~600MB total)
+   - 12 files in `assets/pretrained/`:
+   - D32k.pth, D40k.pth, D48k.pth (discriminators)
+   - G32k.pth, G40k.pth, G48k.pth (generators)
+   - f0D32k.pth, f0D40k.pth, f0D48k.pth (f0 discriminators)
+   - f0G32k.pth, f0G40k.pth, f0G48k.pth (f0 generators)
+
+4. **Pretrained RVC Models v2** (~600MB total)
+   - Same 12 files in `assets/pretrained_v2/`
+
+5. **UVR5 Weights** (optional, ~300MB)
+   - Various files in `assets/uvr5_weights/`
+   - Used for vocal/instrumental separation
+
+**Total model size: ~1.5-2GB**
+
+### Model Download Strategy
+
+**Models are NOT pre-bundled in the app** - they are downloaded on first launch.
+
+This approach:
+- ✅ Keeps app bundle small (~500MB instead of ~3GB)
+- ✅ Reduces GitHub bandwidth and storage costs
+- ✅ Allows users to get updates to models independently
+- ✅ Easier to maintain and distribute
+
+**First Launch Process:**
+1. User opens RVC-MacOS.app
+2. `launcher.py` checks for models (finds none)
+3. Displays clear message about download requirements
+4. Downloads models (~1.5GB, takes 5-10 minutes)
+5. Verifies checksums to ensure integrity
+6. Starts web server on `http://localhost:7860`
+7. Opens browser automatically
+8. **Ready to use after ~10 minutes total on first launch**
+
+**Subsequent Launches:**
+- Models already present
+- Starts immediately in 10-15 seconds
+
 ## Prerequisites
 
 ### System Requirements
@@ -34,7 +87,7 @@ The easiest way to build the application:
 # Make scripts executable (first time only)
 chmod +x build_app.sh create_dmg.sh
 
-# Build the application
+# Build the application (~500MB without models)
 ./build_app.sh
 
 # Create DMG installer
@@ -42,11 +95,13 @@ chmod +x build_app.sh create_dmg.sh
 ```
 
 The build script will:
-1. Create a virtual environment
-2. Install all dependencies
-3. Download required models
+1. Check Python version (must be 3.8-3.10 due to fairseq dependency)
+2. Create a virtual environment
+3. Install all dependencies
 4. Build the .app bundle
 5. Place the result in `dist/RVC-MacOS.app`
+
+**Note**: Models are NOT included in the build. They will be downloaded automatically when users first launch the app.
 
 ### Method 2: Manual Build
 
@@ -91,15 +146,97 @@ RVC-MacOS.app/
 ├── Contents/
 │   ├── Info.plist              # App metadata
 │   ├── MacOS/
-│   │   └── RVC-MacOS           # Main executable
+│   │   └── launcher            # Main executable (from launcher.py)
 │   ├── Resources/
 │   │   ├── lib/                # Python runtime and packages
 │   │   │   └── python3.x/
-│   │   ├── assets/             # Model files
+│   │   ├── .env                # Environment configuration
+│   │   ├── sha256.env          # Model checksums for verification
+│   │   ├── assets/             # Model files (if pre-bundled)
+│   │   │   ├── hubert/
+│   │   │   │   └── hubert_base.pt (~189MB)
+│   │   │   ├── rmvpe/
+│   │   │   │   ├── rmvpe.pt (~55MB)
+│   │   │   │   └── rmvpe.onnx (~55MB)
+│   │   │   ├── pretrained/     # 12 .pth files (~600MB)
+│   │   │   ├── pretrained_v2/  # 12 .pth files (~600MB)
+│   │   │   └── uvr5_weights/   # Optional vocal separation models
 │   │   ├── configs/            # Configuration files
+│   │   ├── infer/              # Inference modules
+│   │   ├── rvc/                # RVC core modules
 │   │   └── ...                 # Other app resources
 │   └── Frameworks/             # Bundled frameworks
 ```
+
+## First Launch Experience
+
+### User's First-Time Experience
+
+1. User downloads `RVC-MacOS-Installer.dmg` (~500MB)
+2. Installs RVC-MacOS.app to Applications
+3. Opens RVC-MacOS.app
+4. Sees console window with clear messages:
+
+```
+============================================================
+RVC-MacOS - Voice Conversion for Apple Silicon
+============================================================
+
+============================================================
+FIRST-TIME SETUP: Downloading Required AI Models
+============================================================
+
+RVC requires AI model files to function.
+These files will now be downloaded (~1.5GB).
+
+What will be downloaded:
+  • HuBERT base model (~189MB)
+  • RMVPE pitch detection models (~110MB)
+  • Pretrained RVC models v1 (~600MB)
+  • Pretrained RVC models v2 (~600MB)
+
+Estimated time: 5-10 minutes
+This only happens once - models are saved for future use.
+
+Please keep this window open and be patient...
+============================================================
+
+Starting download process...
+[Download progress messages...]
+
+============================================================
+✓ SUCCESS! All models downloaded and verified!
+============================================================
+
+============================================================
+Starting RVC Web Interface...
+============================================================
+
+The application will open in your default browser.
+URL: http://localhost:7860
+
+IMPORTANT: Keep this window open while using the app!
+To stop the application, close this window or press Ctrl+C
+============================================================
+```
+
+5. Browser opens automatically to `http://localhost:7860`
+6. **Ready to use!**
+
+### Subsequent Launches
+
+1. User opens RVC-MacOS.app
+2. Models already present (fast check)
+3. Web server starts immediately
+4. Browser opens to `http://localhost:7860`
+5. **Ready in 10-15 seconds**
+
+The launcher script (`launcher.py`) handles all of this automatically by:
+- Calling `check_all_assets()` to verify models exist and are valid
+- Calling `download_all_assets()` if any models are missing
+- Providing clear, informative progress messages
+- Waiting for download completion before starting web interface
+- Handling errors gracefully with helpful messages
 
 ## Configuration Files
 

@@ -51,21 +51,46 @@ Check out our [Demo Video](https://www.bilibili.com/video/BV1pm4y1z7Gm/) here!
 
 ### Download Pre-built App
 Download the latest release from [GitHub Releases](https://github.com/audiohacking/RVC-MacOS/releases):
-1. Download `RVC-MacOS-Installer.dmg`
+1. Download `RVC-MacOS-Installer.dmg` (~500MB)
 2. Open the DMG file
 3. Drag `RVC-MacOS.app` to your Applications folder
 4. Launch from Applications or Spotlight
+
+**Important - First Launch**:
+- **First-time setup takes 5-10 minutes** to download AI models
+- The app will download ~1.5GB of required model files automatically
+- You'll see clear progress messages during the download
+- **Internet connection required** for first launch
+- Subsequent launches are instant (models are saved)
+
+### What Gets Downloaded on First Launch
+
+RVC requires AI model files to function. On first launch, the app automatically downloads:
+- **HuBERT base model** (~189MB): Voice feature extraction
+- **RMVPE pitch models** (~110MB): Pitch detection
+- **Pretrained RVC models v1** (~600MB): Voice conversion
+- **Pretrained RVC models v2** (~600MB): Enhanced voice conversion
+
+**Total**: ~1.5GB downloaded once, used forever
+
+**Disk space needed**: At least 3GB free (for models + temporary files)
 
 ### Build from Source
 To build the standalone application yourself:
 
 ```bash
-# Quick build (automated)
+# Quick build - creates ~500MB app bundle
 ./build_app.sh
 
 # Create DMG installer
 ./create_dmg.sh
 ```
+
+The build script will:
+1. Check for Python 3.8-3.10 (required by fairseq)
+2. Install dependencies
+3. Build the .app bundle (~500MB without models)
+4. Models will be downloaded by end users on first launch
 
 The built application will be in `dist/RVC-MacOS.app` and the DMG installer in `dist/RVC-MacOS-Installer.dmg`.
 
