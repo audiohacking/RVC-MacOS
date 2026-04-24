@@ -2,8 +2,11 @@
 
 set -fa
 
+# Use python3 instead of python
+PYTHON_CMD=python3
+
 # Check if Python is installed
-if ! command -v python; then
+if ! command -v $PYTHON_CMD; then
   echo "Python not found. Please install Python using your package manager or via PyEnv."
   exit 1
 fi
@@ -26,7 +29,7 @@ done
 if [[ ! -d "${venv_path}" ]]; then
   echo "Creating venv..."
 
-  python -m venv "${venv_path}"
+  $PYTHON_CMD -m venv "${venv_path}"
   source "${venv_path}/bin/activate"
 
   # Check if required packages are up-to-date
@@ -39,7 +42,7 @@ source "${venv_path}/bin/activate"
 if [ "$download_models" = true ]; then
   echo ""
   echo "Running model downloader..."
-  python download_models.py
+  $PYTHON_CMD download_models.py
   download_exit_code=$?
   
   if [ $download_exit_code -eq 0 ]; then
@@ -63,4 +66,4 @@ fi
 
 # Run the main script
 echo "Starting RVC WebUI..."
-python web.py --pycmd python
+$PYTHON_CMD web.py --pycmd $PYTHON_CMD
