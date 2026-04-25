@@ -47,7 +47,7 @@ models = {
     # UVR5 权重
     "assets/uvr5_weights/HP2_all_vocals.pth": f"{MIRROR_URL}/fumiama/RVC-Pretrained-Models/resolve/main/uvr5_weights/HP2_all_vocals.pth",
     "assets/uvr5_weights/HP3_all_vocals.pth": f"{MIRROR_URL}/fumiama/RVC-Pretrained-Models/resolve/main/uvr5_weights/HP3_all_vocals.pth",
-    "assets/uvr5_weights/HP5-%E4%B8%BB%E6%97%8B%E5%BE%8B%E4%BA%BA%E5%A3%B0vocals+%E5%85%B6%E4%BB%96instrumentals.pth": f"{MIRROR_URL}/fumiama/RVC-Pretrained-Models/resolve/main/uvr5_weights/HP5-%E4%B8%BB%E6%97%8B%E5%BE%8B%E4%BA%BA%E5%A3%B0vocals+%E5%85%B6%E4%BB%96instrumentals.pth",
+    "assets/uvr5_weights/HP5-主旋律人声 vocals+ 其他 instrumentals.pth": f"{MIRROR_URL}/fumiama/RVC-Pretrained-Models/resolve/main/uvr5_weights/HP5-%E4%B8%BB%E6%97%8B%E5%BE%8B%E4%BA%BA%E5%A3%B0vocals+%E5%85%B6%E4%BB%96instrumentals.pth",
     "assets/uvr5_weights/HP5_only_main_vocal.pth": f"{MIRROR_URL}/fumiama/RVC-Pretrained-Models/resolve/main/uvr5_weights/HP5_only_main_vocal.pth",
     "assets/uvr5_weights/VR-DeEchoAggressive.pth": f"{MIRROR_URL}/fumiama/RVC-Pretrained-Models/resolve/main/uvr5_weights/VR-DeEchoAggressive.pth",
     "assets/uvr5_weights/VR-DeEchoDeReverb.pth": f"{MIRROR_URL}/fumiama/RVC-Pretrained-Models/resolve/main/uvr5_weights/VR-DeEchoDeReverb.pth",
