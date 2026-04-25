@@ -172,9 +172,15 @@ index_paths = [""]
 def lookup_names(weight_root):
     global names
     if weight_root and os.path.exists(weight_root):
-        for name in os.listdir(weight_root):
-            if name.endswith(".pth"):
-                names.append(name)
+        # 递归查找所有子目录中的 .pth 文件
+        for root, dirs, files in os.walk(weight_root):
+            for name in files:
+                if name.endswith(".pth"):
+                    # 使用相对路径作为模型名称
+                    rel_path = os.path.relpath(os.path.join(root, name), weight_root)
+                    # 去掉 .pth 后缀作为显示名称
+                    model_name = rel_path[:-4]  # 去掉 .pth
+                    names.append(model_name)
     else:
         print(f"Warning: Model weights directory not found: {weight_root}")
 
