@@ -38,7 +38,11 @@ def inference(X_spec, device, model, aggressiveness, data):
                     X_mag_window = X_mag_window.half()
                 X_mag_window = X_mag_window.to(device)
 
-                pred = model.predict(X_mag_window, aggressiveness)
+                # 检查模型是否有 predict 方法，兼容不同类型的模型
+                if hasattr(model, 'predict'):
+                    pred = model.predict(X_mag_window, aggressiveness)
+                else:
+                    pred = model(X_mag_window)
 
                 pred = pred.detach().cpu().numpy()
                 preds.append(pred[0])

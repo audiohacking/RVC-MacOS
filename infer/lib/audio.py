@@ -120,7 +120,8 @@ def load_audio(
             )
             for resampled_frame in resampled_frames:
                 frame_data = resampled_frame.to_ndarray()
-                rate = resampled_frame.rate
+                # 确保采样率是整数标量
+                rate = int(resampled_frame.rate) if hasattr(resampled_frame.rate, '__iter__') else int(resampled_frame.rate)
                 frames_data.append(frame_data)
         return (rate, frames_data)
 

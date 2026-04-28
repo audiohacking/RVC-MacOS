@@ -487,7 +487,7 @@ def click_train(
     version19,
     author,
 ):
-    # 生成filelist
+    # 生成 filelist
     exp_dir = "%s/logs/%s" % (now_dir, exp_dir1)
     os.makedirs(exp_dir, exist_ok=True)
     gt_wavs_dir = "%s/0_gt_wavs" % (exp_dir)
@@ -496,19 +496,30 @@ def click_train(
         if version19 == "v1"
         else "%s/3_feature768" % (exp_dir)
     )
+    
+    # 检查特征目录是否存在
+    if not os.path.exists(feature_dir):
+        raise RuntimeError(
+            f"特征目录 {feature_dir} 不存在！请先完成 Hubert 特征提取步骤。"
+        )
+    
     if if_f0_3:
         f0_dir = "%s/2a_f0" % (exp_dir)
         f0nsf_dir = "%s/2b-f0nsf" % (exp_dir)
-        names = (
-            set([name.split(".")[0] for name in os.listdir(gt_wavs_dir)])
-            & set([name.split(".")[0] for name in os.listdir(feature_dir)])
-            & set([name.split(".")[0] for name in os.listdir(f0_dir)])
-            & set([name.split(".")[0] for name in os.listdir(f0nsf_dir)])
-        )
+        # 不同目录的文件名格式不同：
+        # 0_gt_wavs: name.wav → 去掉 .wav 得到 name
+        # 3_feature256/768: name.npy → 去掉 .npy 得到 name
+        # 2a_f0: name.wav.npy → 去掉 .npy 得到 name.wav，再去掉 .wav 得到 name
+        # 2b-f0nsf: name.wav.npy → 去掉 .npy 得到 name.wav，再去掉 .wav 得到 name
+        gt_names = set([name[:-4] for name in os.listdir(gt_wavs_dir) if name.endswith(".wav")])
+        feat_names = set([name[:-4] for name in os.listdir(feature_dir) if name.endswith(".npy")])
+        f0_names = set([name[:-8] for name in os.listdir(f0_dir) if name.endswith(".wav.npy")])
+        f0nsf_names = set([name[:-8] for name in os.listdir(f0nsf_dir) if name.endswith(".wav.npy")])
+        names = gt_names & feat_names & f0_names & f0nsf_names
     else:
-        names = set([name.split(".")[0] for name in os.listdir(gt_wavs_dir)]) & set(
-            [name.split(".")[0] for name in os.listdir(feature_dir)]
-        )
+        gt_names = set([name[:-4] for name in os.listdir(gt_wavs_dir) if name.endswith(".wav")])
+        feat_names = set([name[:-4] for name in os.listdir(feature_dir) if name.endswith(".npy")])
+        names = gt_names & feat_names
     opt = []
     for name in names:
         if if_f0_3:
@@ -538,18 +549,6 @@ def click_train(
                 )
             )
     fea_dim = 256 if version19 == "v1" else 768
-    if if_f0_3:
-        for _ in range(2):
-            opt.append(
-                "%s/logs/mute/0_gt_wavs/mute%s.wav|%s/logs/mute/3_feature%s/mute.npy|%s/logs/mute/2a_f0/mute.wav.npy|%s/logs/mute/2b-f0nsf/mute.wav.npy|%s"
-                % (now_dir, sr2, now_dir, fea_dim, now_dir, now_dir, spk_id5)
-            )
-    else:
-        for _ in range(2):
-            opt.append(
-                "%s/logs/mute/0_gt_wavs/mute%s.wav|%s/logs/mute/3_feature%s/mute.npy|%s"
-                % (now_dir, sr2, now_dir, fea_dim, spk_id5)
-            )
     shuffle(opt)
     with open("%s/filelist.txt" % exp_dir, "w") as f:
         f.write("\n".join(opt))

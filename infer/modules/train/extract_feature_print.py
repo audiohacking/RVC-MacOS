@@ -117,7 +117,8 @@ else:
         try:
             if file.endswith(".wav"):
                 wav_path = "%s/%s" % (wavPath, file)
-                out_path = "%s/%s" % (outPath, file.replace("wav", "npy"))
+                # 只替换最后的扩展名，而不是文件名中所有的"wav"
+                out_path = "%s/%s.npy" % (outPath, file[:-4])
 
                 if os.path.exists(out_path):
                     continue
