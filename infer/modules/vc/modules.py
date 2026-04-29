@@ -99,20 +99,31 @@ class VC:
                 else {"visible": True, "maximum": 0, "__type__": "update"}
             )
 
-        person = f'{os.getenv("weight_root")}/{sid}'
+        # 确保路径包含 .pth 后缀
+        if not sid.endswith('.pth'):
+            person = f'{os.getenv("weight_root")}/{sid}.pth'
+        else:
+            person = f'{os.getenv("weight_root")}/{sid}'
         logger.info(f"Loading: {person}")
 
-        self.net_g, self.cpt = load_synthesizer(person, self.config.device)
-        self.tgt_sr = self.cpt["config"][-1]
-        self.cpt["config"][-3] = self.cpt["weight"]["emb_g.weight"].shape[0]  # n_spk
-        self.if_f0 = self.cpt.get("f0", 1)
-        self.version = self.cpt.get("version", "v1")
+        try:
+            self.net_g, self.cpt = load_synthesizer(person, self.config.device)
+            self.tgt_sr = self.cpt["config"][-1]
+            self.cpt["config"][-3] = self.cpt["weight"]["emb_g.weight"].shape[0]  # n_spk
+            self.if_f0 = self.cpt.get("f0", 1)
+            self.version = self.cpt.get("version", "v1")
 
-        if self.config.is_half:
-            self.net_g = self.net_g.half()
-        else:
-            self.net_g = self.net_g.float()
-        self.pipeline = Pipeline(self.tgt_sr, self.config)
+            if self.config.is_half:
+                self.net_g = self.net_g.half()
+            else:
+                self.net_g = self.net_g.float()
+            self.pipeline = Pipeline(self.tgt_sr, self.config)
+            logger.info(f"Model loaded successfully: {person}")
+        except Exception as e:
+            logger.error(f"Failed to load model: {e}")
+            import traceback
+            logger.error(traceback.format_exc())
+            raise
 
         n_spk = self.cpt["config"][-3]
         index = {"value": get_index_path_from_model(sid), "__type__": "update"}

@@ -809,7 +809,7 @@ with gr.Blocks(title="RVC WebUI") as app:
                     label=i18n("Inferencing voice"), 
                     choices=model_choices,
                     interactive=True,
-                    value=model_choices[0] if model_choices else None
+                    value=None  # 不设置默认值，页面加载时不加载模型
                 )
                 with gr.Column():
                     refresh_button = gr.Button(
@@ -1110,6 +1110,20 @@ with gr.Blocks(title="RVC WebUI") as app:
                     ],
                     api_name="infer_change_voice",
                 )
+                # 页面加载时不自动加载模型，提高启动速度
+                # if model_choices:
+                #     app.load(
+                #         fn=vc.get_vc,
+                #         inputs=[sid0, protect0, protect1, file_index2, file_index4],
+                #         outputs=[
+                #             spk_item,
+                #             protect0,
+                #             protect1,
+                #             file_index2,
+                #             file_index4,
+                #             modelinfo,
+                #         ],
+                #     )
         with gr.TabItem(
             i18n("Vocals/Accompaniment Separation & Reverberation Removal")
         ):
